@@ -4,5 +4,8 @@
 # Ignore IDE configuration
 .idea/
 
-# Ignore API key
-api.key
+# Ignore API keys
+*.key
+
+# Ignore Script Outputs
+output/
