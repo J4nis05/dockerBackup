@@ -38,9 +38,6 @@ def get_endpoints():
         sorted_request = sorted(data_list, key=lambda x: x.get('Name', ''))
         response = json.dumps(sorted_request, indent=2)
 
-        if os.path.exists('output/settings.json'):
-            os.remove('output/settings.json')
-
         with open('output/settings.json', 'w') as file:
             file.write(response)
     else:
