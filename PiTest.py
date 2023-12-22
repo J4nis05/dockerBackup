@@ -1,7 +1,6 @@
 import requests
 import json
-import datetime
-import os
+from datetime import datetime
 
 # Required Endpoints
 #
@@ -9,7 +8,6 @@ import os
 # |---------|----------------------|
 # | POST    | /backup              | --> Portainer Config Backup | optional Parm "password"
 # | GET     | /stacks              | --> List Stacks. Param filters: EndpointID, SwarmID
-# | GET     | /stacks/{id}/file    | --> Returns Docker Compose of Stack as JSON (slightly cursed)
 # | POST    | /stacks/{id}/stop    | --> Stop Stack | Needs Parm id (of Stack) and endpointId
 # | POST    | /stacks/{id}/start   | --> Start Stack | Needs Parm id (of Stack) and endpointId
 #
@@ -40,7 +38,7 @@ def get_endpoints():
         with open('output/endpoints.json', 'w') as endpoints:
             endpoints.write(response)
     else:
-        date = datetime.datetime.now()
+        date = datetime.now()
         print(f'Error {request.status_code} - {request.text}')
 
         with open('output/error.log', 'a') as log:
@@ -65,7 +63,7 @@ def get_backup():
 
         print(f'Backup file "{filename}" successfully created.')
     else:
-        date = datetime.datetime.now()
+        date = datetime.now()
         print(f'Error {request.status_code} - {request.text}')
 
         with open('output/error.log', 'a') as log:
@@ -74,5 +72,32 @@ def get_backup():
         print('Backup file creation failed.')
 
 
-get_backup()
-print('Done')
+def get_stacks():
+    api_endpoint = '/stacks'
+    headers = {'X-API-Key': api_key, 'Content-Type': 'application/json'}
+    request = requests.get(api_url + api_endpoint, headers=headers)
+
+    if request.status_code == 200:
+        response_json = json.loads(request.text)
+
+        stack_ids = [stack['Id'] for stack in response_json]
+        entrypoint_ids = [entrypoint['Id'] for entrypoint in response_json]
+
+        return stack_ids, entrypoint_ids
+    else:
+        date = datetime.now()
+        print(f'Error {request.status_code} - {request.text}')
+
+        with open('output/error.log', 'a') as log:
+            log.write(f'{date} \n{request.status_code} -=- {request.text} \n')
+
+        return None
+
+
+def stop_stacks(stack_ids, entrypoint_ids):
+    print(stack_ids + entrypoint_ids)
+
+
+stacks, entrypoints = get_stacks()
+stop_stacks(stacks)
+print('Done!')
