@@ -95,7 +95,12 @@ def get_stacks():
 
 
 def stop_stacks(stack_ids, entrypoint_ids):
-    print(stack_ids + entrypoint_ids)
+    for stack, entrypoint in stack_ids, entrypoint_ids:
+        api_endpoint = '/stacks/' + stack + '/stop'
+        headers = {'X-API-Key': api_key, 'Content-Type': 'application/json', 'entrypointId': entrypoint}
+        request = requests.post(api_url + api_endpoint, headers=headers)
+
+        print(request.status_code)
 
 
 stacks, entrypoints = get_stacks()
