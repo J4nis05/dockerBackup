@@ -100,9 +100,18 @@ def stop_stacks(stack_ids, entrypoint_ids):
         headers = {'X-API-Key': api_key, 'Content-Type': 'application/json', 'entrypointId': entrypoint}
         request = requests.post(api_url + api_endpoint, headers=headers)
 
-        print(request.status_code)
+        if request.status_code == 200:
+            return None
+        else:
+            date = datetime.now()
+            print(f'Error {request.status_code} - {request.text}')
+
+            with open('output/error.log', 'a') as log:
+                log.write(f'{date} \n{request.status_code} -=- {request.text} \n')
+
+            return None
 
 
 stacks, entrypoints = get_stacks()
-stop_stacks(stacks)
+stop_stacks(stacks, entrypoints)
 print('Done!')
