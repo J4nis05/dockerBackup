@@ -79,14 +79,14 @@ def get_stacks():
 
     if request.status_code == 200:
         response_json = json.loads(request.text)
-
+        # print(response_json)
         stack_ids = [stack['Id'] for stack in response_json]
-        entrypoint_ids = [entrypoint['Id'] for entrypoint in response_json]
+        endpoint_ids = [endpoint['Id'] for endpoint in response_json]
 
-        return stack_ids, entrypoint_ids
+        return stack_ids, endpoint_ids
     else:
         date = datetime.now()
-        print(f'Error {request.status_code} - {request.text}')
+        print(f'Get Stack Error {request.status_code} - {request.text}')
 
         with open('output/error.log', 'a') as log:
             log.write(f'{date} \n{request.status_code} -=- {request.text} \n')
@@ -94,24 +94,23 @@ def get_stacks():
         return None
 
 
-def stop_stacks(stack_ids, entrypoint_ids):
-    for stack, entrypoint in stack_ids, entrypoint_ids:
-        api_endpoint = '/stacks/' + stack + '/stop'
-        headers = {'X-API-Key': api_key, 'Content-Type': 'application/json', 'entrypointId': entrypoint}
-        request = requests.post(api_url + api_endpoint, headers=headers)
+def stop_stacks(stack_ids, endpoint_ids):
+    for stack, endpoint in zip(stack_ids, endpoint_ids):
+        api_endpoint = f'/stacks/{stack}/stop'
+        headers = {'X-API-Key': api_key, 'Content-Type': 'application/json'}
+        data = {'endpointId': endpoint}
+        request = requests.post(api_url + api_endpoint, headers=headers, data=data)
 
         if request.status_code == 200:
-            return None
+            print(f"Stack {stack} stopped successfully!")
         else:
             date = datetime.now()
-            print(f'Error {request.status_code} - {request.text}')
+            print(f'Stop Error {request.status_code} - {request.text}')
 
             with open('output/error.log', 'a') as log:
                 log.write(f'{date} \n{request.status_code} -=- {request.text} \n')
 
-            return None
 
-
-stacks, entrypoints = get_stacks()
-stop_stacks(stacks, entrypoints)
+stacks, endpoints = get_stacks()
+stop_stacks(stacks, endpoints)
 print('Done!')
