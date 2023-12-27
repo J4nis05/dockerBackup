@@ -111,6 +111,24 @@ def stop_stacks(stack_ids, endpoint_ids):
                 log.write(f'{date} \n{request.status_code} -=- {request.text} \n')
 
 
+def start_stack(stack_ids, endpoint_ids):
+    for stack, endpoint in zip(stack_ids, endpoint_ids):
+        api_endpoint = f'/stacks/{stack}/start'
+        headers = {'X-API-Key': api_key, 'Content-Type': 'application/json'}
+        data = {'endpointId': endpoint}
+        request = requests.post(api_url + api_endpoint, headers=headers, data=data)
+
+        if request.status_code == 200:
+            print(f"Stack {stack} started successfully!")
+        else:
+            date = datetime.now()
+            print(f'Stop Error {request.status_code} - {request.text}')
+
+            with open('output/error.log', 'a') as log:
+                log.write(f'{date} \n{request.status_code} -=- {request.text} \n')
+
+
 stacks, endpoints = get_stacks()
 stop_stacks(stacks, endpoints)
+start_stacks(stacks, endpoints)
 print('Done!')
